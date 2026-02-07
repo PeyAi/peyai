@@ -2,7 +2,7 @@
 // ======================
 // CONFIG
 // ======================
-$token = "8235597889:AAHgRf4fyUW3oVI5ytlqFbO-eaANTESk_q4"; // توکن ربات از BotFather
+$token = "8235597889:AAHgRf4fyUW3oVI5ytlqFwwbO-eaANTESk_q4"; // توکن ربات از BotFather
 $api   = "https://api.telegram.org/bot{$token}";
 $SOURCE_USERNAME = "TSdayan";     // بدون @
 $TARGET_CHANNEL  = "@paroo_podcast";    // با @
