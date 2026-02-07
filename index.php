@@ -32,7 +32,7 @@ if (preg_match($pattern, $text, $matches)) {
 
     // ارسال به کانال مقصد
     file_get_contents($api . "/sendMessage?" . http_build_query([
-        "chat_id" => "@aeinweb",
+        "chat_id" => "@paroo_podcast",
         "text"    => $newText
     ]));
 }
