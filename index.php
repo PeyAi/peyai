@@ -4,38 +4,36 @@
 // ======================
 $token = "8235597889:AAHgRf4fyUW3oVI5ytlqFbO-eaANTESk_q4"; // توکن ربات از BotFather
 $api   = "https://api.telegram.org/bot{$token}";
-$logFile = __DIR__ . "/tg_log.txt";
+$update = json_decode(file_get_contents("php://input"), true);
 
-$raw = file_get_contents("php://input");
-file_put_contents($logFile, "-----\n" . date("Y-m-d H:i:s") . "\n" . $raw . "\n", FILE_APPEND);
-
-$update = json_decode($raw, true);
-if (!$update) exit;
-
-$chat_id = $update["message"]["chat"]["id"] ?? null;
-$text    = $update["message"]["text"] ?? null;
-
-if (!$chat_id || $text === null) exit;
-
-$text = trim($text);
-
-$reply = null;
-if ($text === "سلام") {
-    $reply = "درود بر شما";
-} else {
-    // برای تست اینکه اصلا پیام می‌رسه:
-    $reply = "پیامت رسید: " . $text;
+// فقط پیام‌های کانال
+if (!isset($update["channel_post"])) {
+    exit;
 }
 
-$url = $api . "/sendMessage";
-$postData = ["chat_id" => $chat_id, "text" => $reply];
+$post = $update["channel_post"];
+$text = $post["text"] ?? "";
 
-$ch = curl_init($url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-$res = curl_exec($ch);
-$err = curl_error($ch);
-curl_close($ch);
+// فقط از کانال مبدا
+if (($post["chat"]["username"] ?? "") !== "TSdayan") {
+    exit;
+}
 
-file_put_contents($logFile, "SEND_RES:\n" . $res . "\nCURL_ERR:\n" . $err . "\n", FILE_APPEND);
+// الگوی مورد نظر
+$pattern = "/^(.*?)\n\n🔴فروش\s([\d,]+)\n\n@TSdayan$/u";
+
+if (preg_match($pattern, $text, $matches)) {
+
+    $title = trim($matches[1]);      // آبشده
+    $price = trim($matches[2]);      // 80,405
+
+    // ساخت متن جدید
+    $newText = $title . "\n\n🔴فروش " . $price . "\n\n@aeinweb";
+
+    // ارسال به کانال مقصد
+    file_get_contents($api . "/sendMessage?" . http_build_query([
+        "chat_id" => "@aeinweb",
+        "text"    => $newText
+    ]));
+}
+
